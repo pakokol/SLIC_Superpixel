@@ -1,7 +1,7 @@
 #include <iostream>
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
 #include <unistd.h>
+#include "slic.h"
+#include <opencv2/imgcodecs.hpp>
 
 void usage()
 {
@@ -39,8 +39,10 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    cv::Mat testMatrix(512, 512, CV_8UC3, cv::Scalar(0));
-    cv::imshow("test", testMatrix);
-    cv::waitKey();
+    cv::Mat inputMatrix = cv::imread(inputFile);
+    const int numberOfSupperpixels = 1000;
+    const int compactness = 20;
+    superpixel::SLIC slic;
+    slic.getSupperpixels(inputMatrix, numberOfSupperpixels, compactness);
     return 0;
 }
