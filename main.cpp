@@ -39,6 +39,11 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    std::array<double, 5> myArray;
+    myArray = {};
+    for(const auto& v: myArray)
+        std::cout << v << std::endl;
+
     cv::Mat inputMatrix = cv::imread(inputFile);
     const int numberOfSupperpixels = 1000;
     const int compactness = 20;
