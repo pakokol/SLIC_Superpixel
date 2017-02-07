@@ -38,11 +38,13 @@ namespace superpixel {
             }
         }
 
-        double error = 0;
-        const double treshold = 10;
+        double error;
+        const double treshold = 30.0;
+        cv::Mat clusterIndex;
         do{
+            error = 0.0;
             cv::Mat distances(labSpaceInput.size(), CV_64FC1, std::numeric_limits<double>::max());
-            cv::Mat clusterIndex(labSpaceInput.size(), CV_32SC1);
+            clusterIndex = cv::Mat(labSpaceInput.size(), CV_32SC1);
             for (size_t itr = 0; itr < clusterCenters.size(); ++itr) {
                 cv::Point roiCenter = clusterCenters[itr].xy;
                 for (y = roiCenter.y-S; y < roiCenter.y+S; ++y) {
@@ -87,12 +89,28 @@ namespace superpixel {
                 newClusterCenters[itr].xy.y /= numOfPixels[itr];
             }
 
+            //Calculate convergation as proposed in the original paper
+            for (size_t itr = 0; itr < newClusterCenters.size(); ++itr) {
+                error += distance(clusterCenters[itr], newClusterCenters[itr], compactness, S);
+            }
             clusterCenters = newClusterCenters;
-            //TODO Improvment calculate convergation as proposed in the original paper
-            error++;
-        }while(error < treshold);
+        }while(error > treshold);
 
         //TODO enforce conectivity
+
+        for (y = 0; y < labSpaceInput.rows; ++y) {
+            for (x = 0; x < labSpaceInput.cols; ++x) {
+                const int clusIndx = clusterIndex.at<int>(y, x);
+                labSpaceInput.at<cv::Vec3b>(y, x)[0] = clusterCenters[clusIndx].labValue[0];
+                labSpaceInput.at<cv::Vec3b>(y, x)[1] = clusterCenters[clusIndx].labValue[1];
+                labSpaceInput.at<cv::Vec3b>(y, x)[2] = clusterCenters[clusIndx].labValue[2];
+            }
+        }
+
+        cv::imshow("original", input);
+        cv::cvtColor(labSpaceInput, input, CV_Lab2BGR);
+        cv::imshow("SLIC", input);
+        cv::waitKey();
     }
 
     double SLIC::distance(PixelFeature f1, PixelFeature f2, const int compactness, const int S)
