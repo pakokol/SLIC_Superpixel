@@ -42,7 +42,8 @@ int main(int argc, char *argv[])
     cv::Mat inputMatrix = cv::imread(inputFile);
     const int numberOfSupperpixels = 400;
     const int compactness = 20;
+    const double treshold = 30.0;
     superpixel::SLIC slic;
-    slic.getSupperpixels(inputMatrix, numberOfSupperpixels, compactness);
+    slic.getSupperpixels(inputMatrix, numberOfSupperpixels, compactness, treshold);
     return 0;
 }
