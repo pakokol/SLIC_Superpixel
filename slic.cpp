@@ -89,8 +89,8 @@ namespace superpixel {
             clusterCenters = newClusterCenters;
         }while(error > treshold);
 
-        cv::Mat enforcedConnectivityLabels(labels.size(), CV_32S, -1);
-        enforceConnectivity(labels, enforcedConnectivityLabels, numOfSuperpixels);
+        cv::Mat enforcedConnectivityLabels;
+        enforcedConnectivityLabels = enforceConnectivity(labels, numOfSuperpixels);
 
         //Displaying the image so that the pixels get the cluster centers color
         for (y = 0; y < labSpaceInput.rows; ++y) {
@@ -109,7 +109,7 @@ namespace superpixel {
         cv::waitKey();
     }
 
-    void SLIC::enforceConnectivity(cv::Mat labels, cv::Mat& newLabels, const int numOfSuperpixels)
+    cv::Mat SLIC::enforceConnectivity(cv::Mat labels, const int numOfSuperpixels)
     {
         //enforce conectivity - this is note specifically discussed in the original paper
         const std::array<int,4> dx4 = {-1,  0,  1,  0};
@@ -118,7 +118,7 @@ namespace superpixel {
         int adjcLabel = 0;
         std::vector<int> xvec((labels.rows * labels.cols));
         std::vector<int> yvec((labels.rows * labels.cols));
-
+        cv::Mat newLabels(labels.size(), CV_32S, -1);
         for (int y = 0; y < labels.rows; ++y) {
             for (int x = 0; x < labels.cols; ++x) {
 
@@ -165,6 +165,8 @@ namespace superpixel {
                 }
             }
         }
+
+        return newLabels.clone();
     }
 
     double SLIC::distance(PixelFeature f1, PixelFeature f2, const int compactness, const int S)

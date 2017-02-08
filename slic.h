@@ -17,7 +17,7 @@ namespace superpixel {
       void getSupperpixels(cv::Mat input, const int numOfSuperpixels, const int compactness, const double treshold);
      private:
       double distance(PixelFeature f1, PixelFeature f2, const int compactness, const int S);
-      void enforceConnectivity(cv::Mat labels, cv::Mat &newLabels, const int numOfSuperpixels);
+      cv::Mat enforceConnectivity(cv::Mat labels, const int numOfSuperpixels);
       cv::Point getLocalMinimum(cv::Mat input, const int x, const int y, const int n);
     };
 }
